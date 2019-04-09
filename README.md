@@ -1,4 +1,4 @@
-Machine Learning final project:
+Machine Learning Final Project
 The task is content-based music genre classification: given only a song's audio
 content predict how likely the genre label matches the song.
 
