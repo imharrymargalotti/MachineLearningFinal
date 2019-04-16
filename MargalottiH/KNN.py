@@ -1,18 +1,40 @@
 import csv
 import numpy as np
 import os
+import sklearn
 from sklearn import datasets
 from sklearn import neighbors, datasets, preprocessing
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, auc
 from sklearn.neighbors import KNeighborsClassifier
 import math
 from sklearn.multioutput import MultiOutputClassifier
 
+def RandForest(X, Y):
+    X_train, X_test, y_train, y_test = train_test_split(X, Y)
+    output = np.zeros((1967,147))
+    rows, cols = X_test.shape
+
+    for k in range(cols):
+        X_train, X_test, y_train, y_test = train_test_split(X, Y)
+        clf = RandomForestClassifier(n_estimators=100, max_depth=10,
+                                         random_state=0)
+        clf.fit(X_train, y_train[:,k])
+        print(k)
+        y_predict = clf.predict_proba(X_test)
+        # print(y_predict)
+        output[:, k] = y_predict[:, 1]
+
+    # fpr, tpr, thresholds = sklearn.metrics.roc_curve(y_test, output)
+    # roc_auc = auc(fpr, tpr)
+    # print(roc_auc)
+    np.savetxt("RandomForest.csv", output, delimiter=",")
+
 
 def KNN(X_train, x_test, y_train, y_test):
     knn = KNeighborsClassifier(algorithm='auto', metric='minkowski', metric_params=None, n_jobs=-1,
-                         n_neighbors=int(np.sqrt(147)), p=2, weights='distance')
+                         n_neighbors=147, p=2, weights='distance')
 
     knn.fit(X_train, y_train)
     classifier = MultiOutputClassifier(knn, n_jobs=-1)
@@ -51,12 +73,13 @@ def main():
     file = '/Users/harrymargalotti/MLfinal/MachineLearningFinal/Kaggle_Final/cal10k_train_data.csv'
     y = np.array(list(csv.reader(open(file, "r"), delimiter=","))).astype("float")
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y)
-    # print(X_train.shape)
-    # print(X_test.shape)
-    # print(y_test.shape)
-    # print(y_train.shape)
-    KNN(X_train, X_test, y_train, y_test)
+    # X_train, X_test, y_train, y_test = train_test_split(X, y)
+    # print("Xtrain: ", X_train.shape)
+    # print("Xtest: ",X_test.shape)
+    # print("ytrain: ", y_train.shape)
+    # print("ytest: ", y_test.shape)
+    # KNN(X_train, X_test, y_train, y_test)
+    RandForest(X, y)
 main()
 
 
@@ -69,6 +92,13 @@ main()
 
 
 '''
+Xtrain:  (5901, 76)
+Xtest:  (1967, 76)
+ytrain:  (5901, 148)
+ytest:  (1967, 148)
+
+
+
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.33, random_state=42)
 
