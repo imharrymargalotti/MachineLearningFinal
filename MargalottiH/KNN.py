@@ -10,27 +10,30 @@ from sklearn.metrics import accuracy_score, auc
 from sklearn.neighbors import KNeighborsClassifier
 import math
 from sklearn.multioutput import MultiOutputClassifier
+from sklearn.preprocessing import label_binarize
 
-def RandForest(X, Y):
-    X_train, X_test, y_train, y_test = train_test_split(X, Y)
-    output = np.zeros((1967,147))
+
+def RandForest(X_train, y_train, X_test):
+    # X_train, X_test, y_train, y_test = train_test_split(X, Y)
+    output = np.zeros((2705,147))
     rows, cols = X_test.shape
 
     for k in range(cols):
-        X_train, X_test, y_train, y_test = train_test_split(X, Y)
-        clf = RandomForestClassifier(n_estimators=100, max_depth=10,
+        clf = RandomForestClassifier(n_estimators=100, max_depth=60,
                                          random_state=0)
         clf.fit(X_train, y_train[:,k])
-        print(k)
+        print(k, "/75")
         y_predict = clf.predict_proba(X_test)
         # print(y_predict)
         output[:, k] = y_predict[:, 1]
 
+    # print(y_test)
+    # print("\n\n",output)
     # fpr, tpr, thresholds = sklearn.metrics.roc_curve(y_test, output)
     # roc_auc = auc(fpr, tpr)
     # print(roc_auc)
     np.savetxt("RandomForest.csv", output, delimiter=",")
-
+    print("done")
 
 def KNN(X_train, x_test, y_train, y_test):
     knn = KNeighborsClassifier(algorithm='auto', metric='minkowski', metric_params=None, n_jobs=-1,
@@ -79,7 +82,8 @@ def main():
     # print("ytrain: ", y_train.shape)
     # print("ytest: ", y_test.shape)
     # KNN(X_train, X_test, y_train, y_test)
-    RandForest(X, y)
+    print("data load done")
+    RandForest(X, y, xtest)
 main()
 
 
