@@ -4,21 +4,39 @@ import os
 import sklearn
 from sklearn import datasets
 from sklearn import neighbors, datasets, preprocessing
+from sklearn.decomposition import PCA
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, auc
 from sklearn.neighbors import KNeighborsClassifier
 import math
 from sklearn.multioutput import MultiOutputClassifier
-from sklearn.preprocessing import label_binarize
+
+'''
+3 6
+1 4
+2 5
+'''
+def logistic(X_train, y_train, X_test):
+    output = np.zeros((2705, 148))#2705 or 1967
+    # X_train, X_test, y_train, y_test = train_test_split(X, Y)
+    # print(y_train)
+    # clf.predict_proba(X)
+    clf = LogisticRegression(random_state=0, solver='saga', n_jobs=-1, max_iter=250)
+    for k in range(148):
+        clf.fit(X_train, y_train[:, k])
+        print(k+1, "/148")
+        y_predict = clf.predict_proba(X_test)
+        output[:, k] = y_predict[:, 1]
+    np.savetxt("logistic.csv", output, delimiter=",")
 
 
 def RandForest(X_train, y_train, X_test):
     # X_train, X_test, y_train, y_test = train_test_split(X, Y)
     output = np.zeros((2705,147))
-    rows, cols = X_test.shape
 
-    for k in range(cols):
+    for k in range(147):
         clf = RandomForestClassifier(n_estimators=100, max_depth=60,
                                          random_state=0)
         clf.fit(X_train, y_train[:,k])
@@ -83,7 +101,10 @@ def main():
     # print("ytest: ", y_test.shape)
     # KNN(X_train, X_test, y_train, y_test)
     print("data load done")
-    RandForest(X, y, xtest)
+    # RandForest(X, y, xtest)
+    pca = PCA()
+    pca.fit(X)
+    logistic(X, y, xtest)
 main()
 
 
